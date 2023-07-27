@@ -1,0 +1,205 @@
+package com.example.sparkexcercise;
+
+import com.google.common.collect.Iterables;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import scala.Tuple2;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@SpringBootApplication
+public class SparkExcerciseApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SparkExcerciseApplication.class, args);
+
+//        reduce();
+//        map();
+//        tuple();
+//        pairRdd();
+//        refactorPairRdd();
+        flatMapsAndFilters();
+    }
+
+    private static void reduce() {
+        List<Double> inputData = new ArrayList<Double>();
+        inputData.add(35.5);
+        inputData.add(12.499943);
+        inputData.add(90.32);
+        inputData.add(20.32);
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<Double> myRdd = sc.parallelize(inputData);
+
+        Double result = myRdd.reduce((v1, v2) -> v1 + v2);
+
+        System.out.println("result = " + result);
+//        myRdd.reduce(Double::sum);
+
+        sc.close();
+    }
+
+    private static void map() {
+        List<Integer> inputData = new ArrayList<>();
+        inputData.add(35);
+        inputData.add(12);
+        inputData.add(90);
+        inputData.add(20);
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<Integer> myRdd = sc.parallelize(inputData);
+
+        Integer result = myRdd.reduce((v1, v2) -> v1 + v2);
+        JavaRDD<Double> sqrtRdd = myRdd.map(value -> Math.sqrt(value));
+
+//        sqrtRdd.foreach(value -> System.out.println("value = " + value));
+//        sqrtRdd.foreach(System.out::println);
+        sqrtRdd.collect().forEach(System.out::println);
+        //how many elements in sqrtRdd
+        long count1 = sqrtRdd.count();
+
+        //using just map and reduce
+        JavaRDD<Long> singleIntegerRdd = sqrtRdd.map(value -> 1L);
+        Long count = singleIntegerRdd.reduce(Long::sum);
+
+        sc.close();
+    }
+
+    private static void tuple() {
+        List<Integer> inputData = new ArrayList<>();
+        inputData.add(35);
+        inputData.add(12);
+        inputData.add(90);
+        inputData.add(20);
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<Integer> originalIntegers = sc.parallelize(inputData);
+
+        JavaRDD<IntegerWithSquare> sqrtRdd = originalIntegers.map(IntegerWithSquare::new);
+        Tuple2<Integer, Double> myValue = new Tuple2<>(9, 3.0);
+        JavaRDD<Tuple2> myTupleRdd = originalIntegers.map(value -> new Tuple2<Integer, Double>(value, Math.sqrt(value)));
+        sc.close();
+    }
+
+    private static void pairRdd() {
+        List<String> inputData = new ArrayList<>();
+        inputData.add("WARN: Tuesday 4 September 0405");
+        inputData.add("ERROR: Tuesday 4 September 0408");
+        inputData.add("FATAL: Wednesday 5 September 1632");
+        inputData.add("ERROR: Friday 7 September 1854");
+        inputData.add("WARN: Saturday 8 September 1942");
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<String> originalLogMessages = sc.parallelize(inputData);
+
+        JavaPairRDD<String, String> pairRDD = originalLogMessages.mapToPair(rawValue -> {
+            String[] columns = rawValue.split(":");
+            String level = columns[0];
+            String date = columns[1];
+            return new Tuple2<>(level, date);
+        });
+
+        //groupByKey 대체 -> count 용도로 쓸때
+        JavaPairRDD<String, Long> pairRDD2 = originalLogMessages.mapToPair(rawValue -> {
+            String[] columns = rawValue.split(":");
+            String level = columns[0];
+            return new Tuple2<>(level, 1L);
+        });
+        JavaPairRDD<String, Long> groupByCount = pairRDD2.reduceByKey((v1, v2) -> v1 + v2);
+
+
+//        pairRDD.aggregateByKey();
+//        pairRDD.groupByKey();
+        sc.close();
+    }
+
+    private static void refactorPairRdd() {
+        List<String> inputData = new ArrayList<>();
+        inputData.add("WARN: Tuesday 4 September 0405");
+        inputData.add("ERROR: Tuesday 4 September 0408");
+        inputData.add("FATAL: Wednesday 5 September 1632");
+        inputData.add("ERROR: Friday 7 September 1854");
+        inputData.add("WARN: Saturday 8 September 1942");
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        sc.parallelize(inputData)
+                .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .reduceByKey(Long::sum)
+                .foreach(tuple -> System.out.println(tuple._1 + " has " + tuple._2 + " instances"));
+
+        sc.close();
+    }
+
+    private static void groupBy() {
+        //실무 사용 금지
+        List<String> inputData = new ArrayList<>();
+        inputData.add("WARN: Tuesday 4 September 0405");
+        inputData.add("ERROR: Tuesday 4 September 0408");
+        inputData.add("FATAL: Wednesday 5 September 1632");
+        inputData.add("ERROR: Friday 7 September 1854");
+        inputData.add("WARN: Saturday 8 September 1942");
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        sc.parallelize(inputData)
+                .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .groupByKey()
+                .foreach(tuple -> System.out.println(tuple._1 + " has " + Iterables.size(tuple._2) + " instances"));
+
+        sc.close();
+    }
+
+    private static void flatMapsAndFilters() {
+        //실무 사용 금지
+        List<String> inputData = new ArrayList<>();
+        inputData.add("WARN: Tuesday 4 September 0405");
+        inputData.add("ERROR: Tuesday 4 September 0408");
+        inputData.add("FATAL: Wednesday 5 September 1632");
+        inputData.add("ERROR: Friday 7 September 1854");
+        inputData.add("WARN: Saturday 8 September 1942");
+
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        sc.parallelize(inputData)
+                .flatMap(v -> Arrays.asList(v.split(" ")).iterator())
+                .filter(word -> word.length() > 1)
+                .foreach(w -> System.out.println("w = " + w));
+
+        sc.close();
+    }
+}
