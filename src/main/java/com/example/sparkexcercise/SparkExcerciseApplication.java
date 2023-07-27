@@ -27,8 +27,10 @@ public class SparkExcerciseApplication {
 //        tuple();
 //        pairRdd();
 //        refactorPairRdd();
-        flatMapsAndFilters();
+//        flatMapsAndFilters();
+        diskFile();
     }
+
 
     private static void reduce() {
         List<Double> inputData = new ArrayList<Double>();
@@ -201,5 +203,19 @@ public class SparkExcerciseApplication {
                 .foreach(w -> System.out.println("w = " + w));
 
         sc.close();
+    }
+
+    private static void diskFile() {
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input.txt"); //hdfs
+
+        initialRdd
+                .flatMap(v -> Arrays.asList(v.split(" ")).iterator())
+                .foreach(w -> System.out.println("w = " + w));
+
     }
 }
