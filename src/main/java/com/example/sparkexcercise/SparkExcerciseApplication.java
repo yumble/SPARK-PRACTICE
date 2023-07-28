@@ -30,9 +30,9 @@ public class SparkExcerciseApplication {
 //        refactorPairRdd();
 //        flatMapsAndFilters();
 //        diskFile();
-        takeAndReplaceAll();
+//        takeAndReplaceAll();
+        sortAndCoalesce();
     }
-
 
     private static void reduce() {
         List<Double> inputData = new ArrayList<Double>();
@@ -213,7 +213,7 @@ public class SparkExcerciseApplication {
                 .setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input.txt"); //hdfs
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input-spring.txt"); //hdfs
 
         initialRdd
                 .flatMap(v -> Arrays.asList(v.split(" ")).iterator())
@@ -236,12 +236,55 @@ public class SparkExcerciseApplication {
         JavaRDD<String> justInterestingWords = blankWordsRemoved.filter(Util::isNotBoring);
         JavaPairRDD<String, Long> pairRdd = justInterestingWords.mapToPair(word -> new Tuple2<>(word, 1L));
         JavaPairRDD<String, Long> totals = pairRdd.reduceByKey(Long::sum);
+        totals.foreach(v-> System.out.println("v = " + v));
+
+    }
+    private static void sortAndCoalesce() {
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input-spring.txt"); //hdfs
+
+        JavaRDD<String> lettersOnlyRdd = initialRdd.map(sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase());
+        JavaRDD<String> removedBlankLines = lettersOnlyRdd.filter(sentence -> sentence.trim().length() > 0);
+        JavaRDD<String> justWords = removedBlankLines.flatMap(sentence -> Arrays.asList(sentence.split(" ")).iterator());
+        JavaRDD<String> blankWordsRemoved = justWords.filter(word -> word.trim().length() > 0);
+        JavaRDD<String> justInterestingWords = blankWordsRemoved.filter(Util::isNotBoring);
+        JavaPairRDD<String, Long> pairRdd = justInterestingWords.mapToPair(word -> new Tuple2<>(word, 1L));
+        JavaPairRDD<String, Long> totals = pairRdd.reduceByKey(Long::sum);
         //value 가 높은순으로 나열해야하는데 sortByValue는 존재하지않아..
         //key, value switch 하는 트릭사용
         JavaPairRDD<Long, String> switched = totals.mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1));
         JavaPairRDD<Long, String> sorted = switched.sortByKey(false); // false -> descending
-        List<Tuple2<Long, String>> take = sorted.take(50);
-        take.forEach(System.out::println);
+//        List<Tuple2<Long, String>> take = sorted.take(50);
+        List<Tuple2<Long, String>> take = sorted.collect();
+        take.forEach(v-> System.out.println("v = " + v));
+
+    }
+    private static void aws() {
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input-spring.txt"); //hdfs
+//        JavaRDD<String> initialRdd = sc.textFile("s3n://{yourStorageDomain/input.txt"); //hdfs
+
+        JavaRDD<String> lettersOnlyRdd = initialRdd.map(sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase());
+        JavaRDD<String> removedBlankLines = lettersOnlyRdd.filter(sentence -> sentence.trim().length() > 0);
+        JavaRDD<String> justWords = removedBlankLines.flatMap(sentence -> Arrays.asList(sentence.split(" ")).iterator());
+        JavaRDD<String> blankWordsRemoved = justWords.filter(word -> word.trim().length() > 0);
+        JavaRDD<String> justInterestingWords = blankWordsRemoved.filter(Util::isNotBoring);
+        JavaPairRDD<String, Long> pairRdd = justInterestingWords.mapToPair(word -> new Tuple2<>(word, 1L));
+        JavaPairRDD<String, Long> totals = pairRdd.reduceByKey(Long::sum);
+        //value 가 높은순으로 나열해야하는데 sortByValue는 존재하지않아..
+        //key, value switch 하는 트릭사용
+        JavaPairRDD<Long, String> switched = totals.mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1));
+        JavaPairRDD<Long, String> sorted = switched.sortByKey(false); // false -> descending
+//        List<Tuple2<Long, String>> take = sorted.take(50);
+        List<Tuple2<Long, String>> take = sorted.collect();
+        take.forEach(v-> System.out.println("v = " + v));
 
     }
 }
