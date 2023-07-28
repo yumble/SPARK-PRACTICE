@@ -1,9 +1,7 @@
 package com.example.sparkexcercise;
 
+import com.example.sparkexcercise.module1.Join;
 import com.google.common.collect.Iterables;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -14,7 +12,6 @@ import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 @SpringBootApplication
@@ -31,8 +28,11 @@ public class SparkExcerciseApplication {
 //        flatMapsAndFilters();
 //        diskFile();
 //        takeAndReplaceAll();
-        sortAndCoalesce();
+//        sortAndCoalesce();
+//        Join.leftOuterJoin();
+        Join.cartesian();
     }
+
 
     private static void reduce() {
         List<Double> inputData = new ArrayList<Double>();
@@ -287,4 +287,5 @@ public class SparkExcerciseApplication {
         take.forEach(v-> System.out.println("v = " + v));
 
     }
+
 }
