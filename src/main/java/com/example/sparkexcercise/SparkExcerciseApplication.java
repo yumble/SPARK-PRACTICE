@@ -14,6 +14,7 @@ import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @SpringBootApplication
@@ -28,7 +29,8 @@ public class SparkExcerciseApplication {
 //        pairRdd();
 //        refactorPairRdd();
 //        flatMapsAndFilters();
-        diskFile();
+//        diskFile();
+        takeAndReplaceAll();
     }
 
 
@@ -216,6 +218,30 @@ public class SparkExcerciseApplication {
         initialRdd
                 .flatMap(v -> Arrays.asList(v.split(" ")).iterator())
                 .foreach(w -> System.out.println("w = " + w));
+
+    }
+
+    private static void takeAndReplaceAll() {
+        SparkConf conf = new SparkConf()
+                .setAppName("startingSpark")
+                .setMaster("local[*]");
+        JavaSparkContext sc = new JavaSparkContext(conf);
+
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input-spring.txt"); //hdfs
+
+        JavaRDD<String> lettersOnlyRdd = initialRdd.map(sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase());
+        JavaRDD<String> removedBlankLines = lettersOnlyRdd.filter(sentence -> sentence.trim().length() > 0);
+        JavaRDD<String> justWords = removedBlankLines.flatMap(sentence -> Arrays.asList(sentence.split(" ")).iterator());
+        JavaRDD<String> blankWordsRemoved = justWords.filter(word -> word.trim().length() > 0);
+        JavaRDD<String> justInterestingWords = blankWordsRemoved.filter(Util::isNotBoring);
+        JavaPairRDD<String, Long> pairRdd = justInterestingWords.mapToPair(word -> new Tuple2<>(word, 1L));
+        JavaPairRDD<String, Long> totals = pairRdd.reduceByKey(Long::sum);
+        //value 가 높은순으로 나열해야하는데 sortByValue는 존재하지않아..
+        //key, value switch 하는 트릭사용
+        JavaPairRDD<Long, String> switched = totals.mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1));
+        JavaPairRDD<Long, String> sorted = switched.sortByKey(false); // false -> descending
+        List<Tuple2<Long, String>> take = sorted.take(50);
+        take.forEach(System.out::println);
 
     }
 }
