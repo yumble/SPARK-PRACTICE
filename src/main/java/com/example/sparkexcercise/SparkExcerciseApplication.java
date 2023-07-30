@@ -1,6 +1,7 @@
 package com.example.sparkexcercise;
 
-import com.example.sparkexcercise.module1.Join;
+import com.example.sparkexcercise.module1.Performance;
+import com.example.sparkexcercise.module2.SparkSql;
 import com.google.common.collect.Iterables;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -13,6 +14,7 @@ import scala.Tuple2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class SparkExcerciseApplication {
@@ -30,8 +32,14 @@ public class SparkExcerciseApplication {
 //        takeAndReplaceAll();
 //        sortAndCoalesce();
 //        Join.leftOuterJoin();
-        Join.cartesian();
+//        Join.cartesian();
+//        WalkThrough.problem1();
+//        WalkThrough.problem2();
+//        Performance.shufflesAndCache();
+        SparkSql.sparkSql();
+
     }
+
 
 
     private static void reduce() {
@@ -238,6 +246,8 @@ public class SparkExcerciseApplication {
         JavaPairRDD<String, Long> totals = pairRdd.reduceByKey(Long::sum);
         totals.foreach(v-> System.out.println("v = " + v));
 
+        sc.close();
+
     }
     private static void sortAndCoalesce() {
         SparkConf conf = new SparkConf()
@@ -261,6 +271,10 @@ public class SparkExcerciseApplication {
 //        List<Tuple2<Long, String>> take = sorted.take(50);
         List<Tuple2<Long, String>> take = sorted.collect();
         take.forEach(v-> System.out.println("v = " + v));
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+
 
     }
     private static void aws() {
