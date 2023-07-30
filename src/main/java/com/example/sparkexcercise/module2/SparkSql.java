@@ -11,6 +11,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import scala.Function1;
 
+import static org.apache.spark.sql.functions.col;
+
 public class SparkSql {
 
     public static void sparkSql() {
@@ -49,8 +51,13 @@ public class SparkSql {
         //ver3
         Column subjectColumn = dataset.col("subject");
         Column yearColumn = dataset.col("year");
-        Dataset<Row> modernArtResultsUsingColumns = dataset.filter(subjectColumn.equalTo("Modern Art")
-                .and(yearColumn.geq(2007)));
+        Dataset<Row> modernArtResultsUsingColumns = dataset
+                .filter(subjectColumn.equalTo("Modern Art")
+                        .and(yearColumn.geq(2007)));
+        //ver 3-1
+        Dataset<Row> modernArtResultsUsingColumns2 = dataset
+                .filter(col("subject").equalTo("Modern Art")
+                .and(col("year").geq(2007)));
 
 
         modernArtResultsUsingColumns.show();
