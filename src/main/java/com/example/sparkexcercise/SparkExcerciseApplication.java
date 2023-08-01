@@ -36,11 +36,11 @@ public class SparkExcerciseApplication {
 //        WalkThrough.problem1();
 //        WalkThrough.problem2();
 //        Performance.shufflesAndCache();
-        SparkSql.sparkSql();
-
+//        SparkSql.sparkSql();
+//        SparkSql.fullSql();
+//        SparkSql.inMemory();
+        SparkSql.groupingAndAggregation();
     }
-
-
 
     private static void reduce() {
         List<Double> inputData = new ArrayList<Double>();

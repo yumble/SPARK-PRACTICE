@@ -5,11 +5,15 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.sql.Column;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import scala.Function1;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -61,6 +65,91 @@ public class SparkSql {
 
 
         modernArtResultsUsingColumns.show();
+
+        spark.close();
+    }
+
+    public static void fullSql(){
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+        Dataset<Row> dataset = spark.read()
+                .option("header", true)
+                .csv("src/main/resources/exams/students.csv");
+
+        dataset.createOrReplaceTempView("my_students_table");
+
+        Dataset<Row> results = spark.sql("select distinct(year) from my_students_table where subject = 'French' order by year desc");
+
+        results.show();
+
+        spark.close();
+
+    }
+    public static void inMemory() {
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        List<Row> inMemoryList = new ArrayList<>();
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 04:09:32"));
+        inMemoryList.add(RowFactory.create("FATAL", "2016-12-31 03:08:32"));
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 03:09:32"));
+        inMemoryList.add(RowFactory.create("INFO", "2015-4-21 14:32:21"));
+        inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
+
+
+        StructField[] fields = new StructField[] {
+                new StructField("level", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
+        };
+        StructType schema = new StructType(fields);
+        Dataset<Row> dataset = spark.createDataFrame(inMemoryList, schema);
+
+        dataset.show();
+
+        spark.close();
+    }
+    public static void groupingAndAggregation() {
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        List<Row> inMemoryList = new ArrayList<>();
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 04:09:32"));
+        inMemoryList.add(RowFactory.create("FATAL", "2016-12-31 03:08:32"));
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 03:09:32"));
+        inMemoryList.add(RowFactory.create("INFO", "2015-4-21 14:32:21"));
+        inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
+
+
+        StructField[] fields = new StructField[] {
+                new StructField("level", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
+        };
+        StructType schema = new StructType(fields);
+        Dataset<Row> dataset = spark.createDataFrame(inMemoryList, schema);
+
+        dataset.createOrReplaceTempView("logging_table");
+
+        Dataset<Row> results = spark.sql("select level, collect_list(datetime) from logging_table group by level order by level");
+
+        results.show();
 
         spark.close();
     }
