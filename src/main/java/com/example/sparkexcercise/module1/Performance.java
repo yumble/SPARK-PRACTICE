@@ -20,7 +20,7 @@ public class Performance {
         SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/bigLog.txt");
+        JavaRDD<String> initialRdd = sc.textFile("src/main/resources/bigLogTest.txt");
 
         System.out.println("Initial RDD Partition Size: " + initialRdd.getNumPartitions());
 
