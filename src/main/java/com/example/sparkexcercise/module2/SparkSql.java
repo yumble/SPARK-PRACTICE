@@ -153,4 +153,37 @@ public class SparkSql {
 
         spark.close();
     }
+    public static void dateFormatting(){
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        List<Row> inMemoryList = new ArrayList<>();
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 04:09:32"));
+        inMemoryList.add(RowFactory.create("FATAL", "2016-12-31 03:08:32"));
+        inMemoryList.add(RowFactory.create("WARN", "2016-12-31 03:09:32"));
+        inMemoryList.add(RowFactory.create("INFO", "2015-4-21 14:32:21"));
+        inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
+
+
+        StructField[] fields = new StructField[] {
+                new StructField("level", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
+        };
+        StructType schema = new StructType(fields);
+        Dataset<Row> dataset = spark.createDataFrame(inMemoryList, schema);
+
+        dataset.createOrReplaceTempView("logging_table");
+
+        Dataset<Row> results = spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table");
+
+        results.show();
+
+        spark.close();
+    }
 }

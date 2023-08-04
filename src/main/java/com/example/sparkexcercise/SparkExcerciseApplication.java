@@ -39,7 +39,8 @@ public class SparkExcerciseApplication {
 //        SparkSql.sparkSql();
 //        SparkSql.fullSql();
 //        SparkSql.inMemory();
-        SparkSql.groupingAndAggregation();
+//        SparkSql.groupingAndAggregation();
+        SparkSql.dateFormatting();
     }
 
     private static void reduce() {
