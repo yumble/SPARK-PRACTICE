@@ -42,7 +42,8 @@ public class SparkExcerciseApplication {
 //        SparkSql.groupingAndAggregation();
 //        SparkSql.dateFormatting();
 //        SparkSql.multipleGrouping();
-        SparkSql.multipleGroupingByBigLogTxt();
+//        SparkSql.multipleGroupingByBigLogTxt();
+        SparkSql.ordering();
     }
 
     private static void reduce() {
