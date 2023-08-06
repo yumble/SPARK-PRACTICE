@@ -44,7 +44,8 @@ public class SparkExcerciseApplication {
 //        SparkSql.multipleGrouping();
 //        SparkSql.multipleGroupingByBigLogTxt();
 //        SparkSql.ordering();
-        SparkSql.dataFrameVsDateSet();
+//        SparkSql.dataFrameVsDateSet();
+        SparkSql.groupByInJava();
     }
 
     private static void reduce() {
