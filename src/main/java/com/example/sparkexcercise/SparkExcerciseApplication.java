@@ -46,7 +46,8 @@ public class SparkExcerciseApplication {
 //        SparkSql.ordering();
 //        SparkSql.dataFrameVsDateSet();
 //        SparkSql.groupByInJava();
-        SparkSql.pivotTable();
+//        SparkSql.pivotTable();
+        SparkSql.moreAggregations();
     }
 
     private static void reduce() {
