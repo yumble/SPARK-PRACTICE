@@ -375,6 +375,30 @@ public class SparkSql {
 
         dataset.show(100);
 
+
+    }
+    public static void practicalSession() {
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        Dataset<Row> dataset = spark.read()
+                .option("header", true)
+//                .option("inferSchema", true) -> 사용 금지
+                .csv("src/main/resources/exams/students.csv");
+
+        dataset = dataset.groupBy("subject")
+                .pivot("year")
+                .agg(round(avg(col("score")), 2).alias("average"),
+                        round(stddev(col("score")), 2).alias("stddev"));
+
+        dataset.show();
+
         spark.close();
     }
 }
