@@ -12,9 +12,9 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import scala.Function1;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.xml.crypto.Data;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.apache.spark.sql.functions.*;
 
@@ -62,7 +62,7 @@ public class SparkSql {
         //ver 3-1
         Dataset<Row> modernArtResultsUsingColumns2 = dataset
                 .filter(col("subject").equalTo("Modern Art")
-                .and(col("year").geq(2007)));
+                        .and(col("year").geq(2007)));
 
 
         modernArtResultsUsingColumns.show();
@@ -70,7 +70,7 @@ public class SparkSql {
         spark.close();
     }
 
-    public static void fullSql(){
+    public static void fullSql() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -92,6 +92,7 @@ public class SparkSql {
         spark.close();
 
     }
+
     public static void inMemory() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
@@ -110,7 +111,7 @@ public class SparkSql {
         inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
 
 
-        StructField[] fields = new StructField[] {
+        StructField[] fields = new StructField[]{
                 new StructField("level", DataTypes.StringType, false, Metadata.empty()),
                 new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
         };
@@ -121,6 +122,7 @@ public class SparkSql {
 
         spark.close();
     }
+
     public static void groupingAndAggregation() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
@@ -139,7 +141,7 @@ public class SparkSql {
         inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
 
 
-        StructField[] fields = new StructField[] {
+        StructField[] fields = new StructField[]{
                 new StructField("level", DataTypes.StringType, false, Metadata.empty()),
                 new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
         };
@@ -154,7 +156,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void dateFormatting(){
+
+    public static void dateFormatting() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -172,7 +175,7 @@ public class SparkSql {
         inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
 
 
-        StructField[] fields = new StructField[] {
+        StructField[] fields = new StructField[]{
                 new StructField("level", DataTypes.StringType, false, Metadata.empty()),
                 new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
         };
@@ -187,7 +190,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void multipleGrouping(){
+
+    public static void multipleGrouping() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -205,7 +209,7 @@ public class SparkSql {
         inMemoryList.add(RowFactory.create("FATAL", "2015-4-21 19:23:02"));
 
 
-        StructField[] fields = new StructField[] {
+        StructField[] fields = new StructField[]{
                 new StructField("level", DataTypes.StringType, false, Metadata.empty()),
                 new StructField("datetime", DataTypes.StringType, false, Metadata.empty())
         };
@@ -220,7 +224,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void multipleGroupingByBigLogTxt(){
+
+    public static void multipleGroupingByBigLogTxt() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -250,7 +255,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void ordering(){
+
+    public static void ordering() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -275,7 +281,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void dataFrameVsDateSet(){
+
+    public static void dataFrameVsDateSet() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -297,7 +304,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void groupByInJava(){
+
+    public static void groupByInJava() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -325,7 +333,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void pivotTable(){
+
+    public static void pivotTable() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -343,7 +352,7 @@ public class SparkSql {
                 functions.date_format(col("datetime"), "MMMM").alias("month"),
                 date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
 
-        Object[] months = new Object[] { "NoMonth", "January", "February", "March", "April",
+        Object[] months = new Object[]{"NoMonth", "January", "February", "March", "April",
                 "May", "June", "July", "August", "September", "October", "November", "December"};
         List<Object> columns = Arrays.asList(months);
 
@@ -354,7 +363,8 @@ public class SparkSql {
 
         spark.close();
     }
-    public static void moreAggregations(){
+
+    public static void moreAggregations() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -377,6 +387,7 @@ public class SparkSql {
 
 
     }
+
     public static void practicalSession() {
         System.setProperty("hadoop.home.dir", "c:/hadoop");
         Logger.getLogger("org.apache").setLevel(Level.WARN);
@@ -401,4 +412,80 @@ public class SparkSql {
 
         spark.close();
     }
-}
+
+    public static void userDefined() {
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        spark.udf().register("hasPassed", (String grade) -> grade.equals("A+"),
+                DataTypes.BooleanType);
+
+        spark.udf().register("hasPassed1", (String grade) -> {
+                    return grade.startsWith("A") || grade.startsWith("B");
+                },
+                DataTypes.BooleanType);
+
+        spark.udf().register("hasPassed2", (String grade, String subject) -> {
+                    if (subject.equals("Biology")) {
+                        return grade.startsWith("A");
+                    }
+                    return grade.startsWith("A") || grade.startsWith("B");
+                },
+                DataTypes.BooleanType);
+
+        Dataset<Row> dataset = spark.read()
+                .option("header", true)
+//                .option("inferSchema", true) -> 사용 금지
+                .csv("src/main/resources/exams/students.csv");
+
+//        dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
+        dataset = dataset.withColumn("pass", callUDF("hasPassed", col("grade")));
+        dataset = dataset.withColumn("pass2", callUDF("hasPassed2", col("grade"), col("subject")));
+
+        dataset.show();
+
+        spark.close();
+    }
+
+    public static void userDefined2() {
+        System.setProperty("hadoop.home.dir", "c:/hadoop");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+
+        SparkSession spark = SparkSession.builder()
+                .appName("testingSql")
+                .master("local[*]")
+                .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
+                .getOrCreate();
+
+        Dataset<Row> dataset = spark.read()
+                .option("header", true)
+                .csv("src/main/resources/biglog.txt");
+
+        SimpleDateFormat input = new SimpleDateFormat("MMMM", Locale.ENGLISH);
+        SimpleDateFormat output = new SimpleDateFormat("M");
+
+        spark.udf().register("monthNum", (String month) -> {
+                    Date inputDate = input.parse(month);
+                    return Integer.parseInt(output.format(inputDate));
+                },
+                DataTypes.IntegerType);
+
+        dataset.createOrReplaceTempView("logging_table");
+
+        Dataset<Row> results = spark.sql(
+                "select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
+                        "from logging_table group by level, month order by monthNum(month), level"
+        );
+
+        results.show(100);
+
+        spark.close();
+    }
+
+    }
