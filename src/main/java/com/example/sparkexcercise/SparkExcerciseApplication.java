@@ -52,6 +52,7 @@ public class SparkExcerciseApplication {
 //        SparkSql.userDefined();
 //        SparkSql.userDefined2();
         SparkSql.performance();
+//        SparkSql.hashAggregation();
     }
 
     private static void reduce() {
