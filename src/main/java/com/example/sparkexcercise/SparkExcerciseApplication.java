@@ -50,7 +50,8 @@ public class SparkExcerciseApplication {
 //        SparkSql.moreAggregations();
 //        SparkSql.practicalSession();
 //        SparkSql.userDefined();
-        SparkSql.userDefined2();
+//        SparkSql.userDefined2();
+        SparkSql.performance();
     }
 
     private static void reduce() {
