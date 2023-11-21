@@ -36,7 +36,7 @@ public class SparkExcerciseApplication {
 //        WalkThrough.problem1();
 //        WalkThrough.problem2();
 //        Performance.shufflesAndCache();
-//        SparkSql.sparkSql();
+        SparkSql.sparkSql();
 //        SparkSql.fullSql();
 //        SparkSql.inMemory();
 //        SparkSql.groupingAndAggregation();
@@ -51,7 +51,7 @@ public class SparkExcerciseApplication {
 //        SparkSql.practicalSession();
 //        SparkSql.userDefined();
 //        SparkSql.userDefined2();
-        SparkSql.performance();
+//        SparkSql.performance();
 //        SparkSql.hashAggregation();
     }
 

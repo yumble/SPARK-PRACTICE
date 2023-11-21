@@ -3,18 +3,22 @@ package com.example.sparkexcercise.module2;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import scala.Function1;
+import scala.Tuple2;
 
 import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.spark.sql.functions.*;
 
@@ -30,42 +34,71 @@ public class SparkSql {
                 .config("spark.sql.warehouse.dir", "file:///Users/h._.jxxn/tmp/")
                 .getOrCreate();
         Dataset<Row> dataset = spark.read()
-                .option("header", true)
-                .csv("src/main/resources/exams/students.csv");
+                .option("header", false)
+                .csv("src/main/resources/viewing/titles.csv");
+
+
+        dataset = dataset.offset(0);
+        dataset = dataset.limit(1);
+
         dataset.show();
+        RelationalGroupedDataset relationalGroupedDataset = dataset.groupBy();
+        dataset.show();
+// 각 열의 결과를 저장할 리스트를 생성합니다.
+        List<Column> aggs = new ArrayList<>();
+
+// 각 열의 값들을 콤마로 연결하고 결과를 리스트에 추가합니다.
+        for (String colName : dataset.columns()) {
+            aggs.add(concat_ws(",", collect_list(dataset.col(colName))).alias(colName));
+        }
+        dataset.show();
+        Row adataset = relationalGroupedDataset.agg(aggs.get(0), aggs.subList(1, aggs.size()).toArray(new Column[0])).first();
+        String[] columnNames = new String[adataset.size()];
+        for (int i = 0; i < adataset.size(); i++) {
+            columnNames[i] = adataset.getString(i);
+        }
+
+// 결과를 출력합니다.
+        dataset = dataset.toDF(columnNames);
+        dataset.show();
+//
+//        dataset = dataset.agg(concat_ws(", ", columns));
+//        dataset.collect();
+//        dataset.collectAsList();
+//        System.out.println("dataset = " + dataset.collect());
 
 
-        long numberOfRows = dataset.count();
-        System.out.println("numberOfRows = " + numberOfRows);
-
-        Row firstRow = dataset.first();
-
-        String subject = firstRow.get(2).toString(); //index number
-        System.out.println("subject = " + subject);
-        String subject2 = firstRow.getAs("subject").toString();//index number
-        System.out.println("subject2 = " + subject2);
-
-//        String[] columns = dataset.columns();
-
-        //ver1
-        Dataset<Row> modernArtResultsUsingExpressions = dataset.filter(" subject = 'Modern Art' AND year >= 2007 ");
-        //ver2
-        Dataset<Row> modernArtResultsUsingLambdas = dataset
-                .filter((FilterFunction<Row>) row -> row.getAs("subject").equals("Modern Art")
-                        && Integer.parseInt(row.getAs("year")) >= 2007);
-        //ver3
-        Column subjectColumn = dataset.col("subject");
-        Column yearColumn = dataset.col("year");
-        Dataset<Row> modernArtResultsUsingColumns = dataset
-                .filter(subjectColumn.equalTo("Modern Art")
-                        .and(yearColumn.geq(2007)));
-        //ver 3-1
-        Dataset<Row> modernArtResultsUsingColumns2 = dataset
-                .filter(col("subject").equalTo("Modern Art")
-                        .and(col("year").geq(2007)));
-
-
-        modernArtResultsUsingColumns.show();
+//        long numberOfRows = dataset.count();
+//        System.out.println("numberOfRows = " + numberOfRows);
+//
+//        Row firstRow = dataset.first();
+//
+//        String subject = firstRow.get(2).toString(); //index number
+//        System.out.println("subject = " + subject);
+//        String subject2 = firstRow.getAs("subject").toString();//index number
+//        System.out.println("subject2 = " + subject2);
+//
+////        String[] columns = dataset.columns();
+//
+//        //ver1
+//        Dataset<Row> modernArtResultsUsingExpressions = dataset.filter(" subject = 'Modern Art' AND year >= 2007 ");
+//        //ver2
+//        Dataset<Row> modernArtResultsUsingLambdas = dataset
+//                .filter((FilterFunction<Row>) row -> row.getAs("subject").equals("Modern Art")
+//                        && Integer.parseInt(row.getAs("year")) >= 2007);
+//        //ver3
+//        Column subjectColumn = dataset.col("subject");
+//        Column yearColumn = dataset.col("year");
+//        Dataset<Row> modernArtResultsUsingColumns = dataset
+//                .filter(subjectColumn.equalTo("Modern Art")
+//                        .and(yearColumn.geq(2007)));
+//        //ver 3-1
+//        Dataset<Row> modernArtResultsUsingColumns2 = dataset
+//                .filter(col("subject").equalTo("Modern Art")
+//                        .and(col("year").geq(2007)));
+//
+//
+//        modernArtResultsUsingColumns.show();
 
         spark.close();
     }
